@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package session_data;
+
+enum role {
+    USER = 1001;
+    AGENT = 1002;
+    ADMIN = 1003;
+}
+
+message session {
+    required string name = 1;
+    required role role = 2;
+    required int64 creation_time = 3;
+    required int64 expiration_time = 4;
+}

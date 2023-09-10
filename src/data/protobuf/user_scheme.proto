@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package user_data;
+
+enum action {
+    REGISTER = 100;
+    LOGIN = 101;
+}
+
+message user {
+    optional string name = 1;
+    optional string email = 2;
+    required string password = 3;
+    required action action = 4;
+}
