@@ -32,7 +32,7 @@ void http_session::on_read(beast::error_code er, std::size_t bytes) {
     if(er == http::error::end_of_stream)
         return do_close();
     if(er)
-        return;//FIXME: return error handler
+        return fail(er,"read");
 
     send_response(handle_request(*_doc_root,
                                  std::move(_request)));
@@ -42,7 +42,7 @@ void http_session::on_write(beast::error_code er, std::size_t bytes) {
     boost::ignore_unused(bytes);
 
     if(er)
-        return;//FIXME: return er handler
+        return fail(er,"write");
 
     do_read();
 }

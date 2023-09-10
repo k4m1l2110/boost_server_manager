@@ -8,6 +8,7 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
+#include <iostream>
 
 namespace beast = boost::beast;
 namespace http = boost::beast::http;
@@ -170,6 +171,12 @@ handle_request(
     res.content_length(size);
     res.keep_alive(req.keep_alive());
     return res;
+}
+
+void
+fail(beast::error_code ec, char const* what)
+{
+    std::cerr << what << ": " << ec.message() << "\n";
 }
 
 #endif //WEBSERVER_HTTP_UTILS_H
