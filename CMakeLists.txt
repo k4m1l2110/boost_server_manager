@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 project(WebServer)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost REQUIRED)
 
@@ -19,8 +19,8 @@ add_executable(WebServer
         #src/wss/server.hpp
         src/main.cpp
         src/session/http_session.cpp
-        src/utils/http_utils.h
-        src/listener/listener.h
+        #src/utils/http_utils.h
+        #src/listener/listener.h
 )
 
 target_link_libraries(WebServer ${Boost_LIBRARIES})

@@ -60,8 +60,7 @@ void http_session::send_response(http::message_generator &&ms) {
             std::move(ms),
             beast::bind_front_handler(
                     &http_session::on_write,
-                    shared_from_this(),
-                    keep_alive
+                    shared_from_this()
                     )
             );
 }

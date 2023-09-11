@@ -1,7 +1,7 @@
 //
 // Created by kamil on 10.09.23.
 //
-
+#pragma once
 #ifndef WEBSERVER_HTTP_UTILS_H
 #define WEBSERVER_HTTP_UTILS_H
 
@@ -13,7 +13,7 @@
 namespace beast = boost::beast;
 namespace http = boost::beast::http;
 
-std::string
+inline std::string
 path_cat(
         beast::string_view base,
         beast::string_view path)
@@ -38,7 +38,7 @@ path_cat(
     return result;
 }
 
-beast::string_view
+inline beast::string_view
 mime_type(beast::string_view path)
 {
     using beast::iequals;
@@ -173,7 +173,7 @@ handle_request(
     return res;
 }
 
-void
+inline void
 fail(beast::error_code ec, char const* what)
 {
     std::cerr << what << ": " << ec.message() << "\n";
