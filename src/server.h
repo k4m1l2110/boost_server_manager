@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 #include "../listener/listener.h"
+#include <ncurses.h>
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
@@ -19,10 +20,12 @@ namespace net = boost::asio;            // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 #define _HTTP_PORT 8080
-#define _ADDR "localhost"
+#define _ADDR "0.0.0.0"
 
 
 class server {
+
+    std::vector<std::shared_ptr<listener>> _listeners;
     net::ip::address _ip;
     unsigned short _port;
     net::io_context _ioc;
@@ -33,7 +36,10 @@ public:
     server(std::string addr = _ADDR, unsigned short port = _HTTP_PORT, int io_threads = 1) :
             _ip(net::ip::make_address(addr)), _port(port), _ioc(std::max<int>(1, io_threads)), _io_threads_num(io_threads) {}
 
-    void run_http(std::string doc_root);
+    void create_listeners(std::string doc_root);
+    void run_http();
+    void stop_listeners();
+
 
 };
 

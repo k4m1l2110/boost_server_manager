@@ -22,6 +22,7 @@
 #include <thread>
 #include <vector>
 
+
 namespace net = boost::asio;
 namespace beast = boost::beast;
 using tcp = boost::asio::ip::tcp;
@@ -31,32 +32,11 @@ protected:
     net::io_context &_ioc;
     tcp::acceptor _acceptor;
     std::shared_ptr<std::string const> doc_root_;
+    std::atomic<bool> stop_requested{false};
 
-    void
-    do_accept() {
-        // The new connection gets its own strand
-        _acceptor.async_accept(
-                net::make_strand(_ioc),
-                beast::bind_front_handler(
-                        &listener::on_accept,
-                        shared_from_this()));
-    }
+    void do_accept();
 
-    void
-    on_accept(beast::error_code ec, tcp::socket socket) {
-        if (ec) {
-            fail(ec, "accept");
-            return; // To avoid infinite loop
-        } else {
-            // Create the session and run it
-            std::make_shared<http_session>(
-                    std::move(socket),
-                    doc_root_)->run();
-        }
-
-        // Accept another connection
-        do_accept();
-    }
+    void on_accept(beast::error_code ec, tcp::socket socket);
 
 public:
     listener(net::io_context &ioc, tcp::endpoint endpoint, std::shared_ptr<std::string const> const &doc_root)
@@ -90,9 +70,10 @@ public:
         }
     }
 
-    void run() {
-        do_accept();
-    }
+    void run();
+
+    void stop();
+
 };
 
 #endif //WEBSERVER_LISTENER_H

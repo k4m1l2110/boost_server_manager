@@ -79,6 +79,7 @@ handle_request(
         beast::string_view doc_root,
         http::request<Body, http::basic_fields<Allocator>>&& req)
 {
+
     // Returns a bad request response
     auto const bad_request =
             [&req](beast::string_view why)
