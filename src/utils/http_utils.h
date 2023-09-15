@@ -176,7 +176,8 @@ handle_request(
 inline void
 fail(beast::error_code ec, char const* what)
 {
-    std::cerr << what << ": " << ec.message() << "\n";
+    std::cerr << what << "\n";
+    throw ec;
 }
 
 #endif //WEBSERVER_HTTP_UTILS_H

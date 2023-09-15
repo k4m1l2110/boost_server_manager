@@ -26,14 +26,14 @@ namespace net = boost::asio;
 namespace beast = boost::beast;
 using tcp = boost::asio::ip::tcp;
 
-class listener : public std::enable_shared_from_this<listener>{
+class listener : public std::enable_shared_from_this<listener> {
 protected:
-    net::io_context& _ioc;
+    net::io_context &_ioc;
     tcp::acceptor _acceptor;
     std::shared_ptr<std::string const> doc_root_;
+
     void
-    do_accept()
-    {
+    do_accept() {
         // The new connection gets its own strand
         _acceptor.async_accept(
                 net::make_strand(_ioc),
@@ -43,15 +43,11 @@ protected:
     }
 
     void
-    on_accept(beast::error_code ec, tcp::socket socket)
-    {
-        if(ec)
-        {
+    on_accept(beast::error_code ec, tcp::socket socket) {
+        if (ec) {
             fail(ec, "accept");
             return; // To avoid infinite loop
-        }
-        else
-        {
+        } else {
             // Create the session and run it
             std::make_shared<http_session>(
                     std::move(socket),
@@ -61,42 +57,40 @@ protected:
         // Accept another connection
         do_accept();
     }
+
 public:
-    listener(net::io_context& ioc, tcp::endpoint endpoint, std::shared_ptr<std::string const> const& doc_root)
-        :_ioc(ioc), _acceptor(net::make_strand(ioc)),doc_root_(doc_root){
-    beast::error_code er;
+    listener(net::io_context &ioc, tcp::endpoint endpoint, std::shared_ptr<std::string const> const &doc_root)
+            : _ioc(ioc), _acceptor(net::make_strand(ioc)), doc_root_(doc_root) {
+        beast::error_code er;
 
-    _acceptor.open(endpoint.protocol(), er);
-    if(er)
-    {
-        fail(er, "open");
-        return;
+        _acceptor.open(endpoint.protocol(), er);
+        if (er) {
+            fail(er, "open");
+            return;
+        }
+
+        _acceptor.set_option(net::socket_base::reuse_address(true), er);
+        if (er) {
+            fail(er, "set_option");
+            return;
+        }
+
+        _acceptor.bind(endpoint, er);
+        if (er) {
+            fail(er, "bind");
+            return;
+        }
+
+        // Start listening for connections
+        _acceptor.listen(
+                net::socket_base::max_listen_connections, er);
+        if (er) {
+            fail(er, "listen");
+            return;
+        }
     }
 
-    _acceptor.set_option(net::socket_base::reuse_address(true), er);
-    if(er)
-    {
-        fail(er, "set_option");
-        return;
-    }
-
-    _acceptor.bind(endpoint, er);
-    if(er)
-    {
-        fail(er, "bind");
-        return;
-    }
-
-    // Start listening for connections
-    _acceptor.listen(
-            net::socket_base::max_listen_connections, er);
-    if(er)
-    {
-        fail(er, "listen");
-        return;
-    }
-    }
-    void run(){
+    void run() {
         do_accept();
     }
 };

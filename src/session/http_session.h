@@ -4,12 +4,14 @@
 
 #ifndef WEBSERVER_HTTP_SESSION_H
 #define WEBSERVER_HTTP_SESSION_H
-#include "../utils/http_utils.h"
+
 #include "session.h"
+#include "../utils/http_utils.h"
+#include <string>
+#include <memory>
+#include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
-#include <boost/asio.hpp>
-#include <boost/beast/version.hpp>
 
 
 namespace net = boost::asio;
@@ -19,22 +21,26 @@ namespace beast = boost::beast;         // from <boost/beast.hpp>
 using tcp = boost::asio::ip::tcp;
 
 
-class http_session: public std::enable_shared_from_this<http_session> {
-    beast::tcp_stream _tcp_stream;
-    beast::flat_buffer _buffer;
+class http_session : public virtual session {
     std::shared_ptr<std::string const> _doc_root;
     http::request<http::string_body> _request;
 public:
-    http_session(tcp::socket &&socket,std::shared_ptr<std::string const> const& doc_root)
-        : _tcp_stream(std::move(socket)),_doc_root(doc_root) { ; }
-    void run();
-    void do_read();
+    http_session(tcp::socket &&socket, std::shared_ptr<std::string const> const &doc_root)
+            : session(std::move(socket)), _doc_root(doc_root) { ; }
+
+    void run() override;
+
+    void do_read() override;
+
     void on_read(beast::error_code er,
-                 std::size_t bytes);
+                 std::size_t bytes) override;
+
     void on_write(beast::error_code er,
-                  std::size_t bytes);
-    void do_close();
-    void send_response(http::message_generator&& ms);
+                  std::size_t bytes) override;
+
+    void do_close() override;
+
+    void send_response(http::message_generator &&ms);
 };
 
 

@@ -16,11 +16,9 @@ include_directories(src/data/flatbuffer)
 
 add_executable(WebServer
         #src/wss/server.cpp
-        #src/wss/server.hpp
+        src/server.cpp
         src/main.cpp
         src/session/http_session.cpp
-        #src/utils/http_utils.h
-        #src/listener/listener.h
 )
 
 target_link_libraries(WebServer ${Boost_LIBRARIES})

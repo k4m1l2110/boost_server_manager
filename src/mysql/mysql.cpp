@@ -1,4 +1,4 @@
-#include "../server.hpp"
+#include "../server.h"
 
 #include "../argon2/hash_utils.hpp"
 
