@@ -70,4 +70,8 @@ void http_session::send_response(http::message_generator &&ms) {
     );
 }
 
+std::shared_ptr<session> http_session::create_session(tcp::socket socket,std::string doc_root) {
+    return std::make_shared<http_session>(std::move(socket),std::make_shared<std::string const>(doc_root));
+}
+
 

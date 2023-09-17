@@ -23,23 +23,27 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 #define _ADDR "0.0.0.0"
 
 
-class server {
-
+class server : public std::enable_shared_from_this<server> {
+private:
+    std::shared_ptr<session> _current_session;
+    std::string _ID;
     std::vector<std::shared_ptr<listener>> _listeners;
     net::ip::address _ip;
-    unsigned short _port;
     net::io_context _ioc;
     unsigned _io_threads_num;
     std::vector<std::thread> _threads;
 
 public:
-    server(std::string addr = _ADDR, unsigned short port = _HTTP_PORT, int io_threads = 1) :
-            _ip(net::ip::make_address(addr)), _port(port), _ioc(std::max<int>(1, io_threads)), _io_threads_num(io_threads) {}
+    server(const std::string ID,const std::string addr = _ADDR, int io_threads = 1) :
+            _ID(ID),_ip(net::ip::make_address(addr)), _ioc(std::max<int>(1, io_threads)), _io_threads_num
+            (io_threads) {}
 
-    void create_listeners(std::string doc_root);
-    void run_http();
+    const ip::address &get_ip() const;
+    const std::string &get_ID() const;
+    void create_listener(unsigned _port,SESSION_TYPE _type);
+    void run_listeners();
     void stop_listeners();
-
+    std::vector<unsigned> get_ports();
 
 };
 

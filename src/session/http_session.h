@@ -21,7 +21,7 @@ namespace beast = boost::beast;         // from <boost/beast.hpp>
 using tcp = boost::asio::ip::tcp;
 
 
-class http_session : public virtual session {
+class http_session : public session {
     std::shared_ptr<std::string const> _doc_root;
     http::request<http::string_body> _request;
 public:
@@ -40,7 +40,11 @@ public:
 
     void do_close() override;
 
+    static std::shared_ptr<session> create_session(tcp::socket socket,std::string doc_root);
+
     void send_response(http::message_generator &&ms);
+
+
 };
 
 

@@ -15,12 +15,8 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
         return; // To avoid infinite loop
     } else {
         // Create the session and run it
-
-        std::make_shared<http_session>(
-                std::move(socket),
-                doc_root_)->run();
+        get_session(_current_type,std::move(socket))->run();
     }
-
     // Accept another connection
     do_accept();
 }
@@ -32,4 +28,19 @@ void listener::run() {
 void listener::stop() {
     stop_requested.store(true);
     _acceptor.close();
+}
+
+unsigned int listener::get_port() const {
+    return _port;
+}
+
+std::shared_ptr<session> listener::get_session(SESSION_TYPE _type,tcp::socket socket){
+    std::string doc_root;
+    switch(_type){
+        case SESSION_TYPE::HTTP:
+            std::cout<<"Set document root: ";std::cin>>doc_root;
+            return http_session::create_session(std::move(socket),doc_root);
+        default:
+            break;
+    }
 }

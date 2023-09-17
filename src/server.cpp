@@ -2,7 +2,7 @@
 
 
 
-void server::run_http() {
+void server::run_listeners() {
     try {
         std::vector<std::thread> v;
         _threads.reserve(_io_threads_num - 1);
@@ -18,15 +18,15 @@ void server::run_http() {
     }
 }
 
-void server::create_listeners(std::string doc_root) {
+void server::create_listener(unsigned _port,SESSION_TYPE _type) {
     auto new_listener = std::make_shared<listener>(
             _ioc,
-            tcp::endpoint(_ip,_port),
-            std::make_shared<std::string>(doc_root)
+            tcp::endpoint(_ip,_port)
             );
-    new_listener->run();
-    _listeners.push_back(new_listener);
 
+    new_listener->run();
+
+    _listeners.push_back(new_listener);
 }
 
 void server::stop_listeners() {
@@ -35,4 +35,20 @@ void server::stop_listeners() {
     }
     _listeners.clear();
 
+}
+
+const ip::address &server::get_ip() const {
+    return _ip;
+}
+
+const std::string &server::get_ID() const {
+    return _ID;
+}
+
+std::vector<unsigned> server::get_ports(){
+    std::vector<unsigned> _p;
+    for(const auto& l:_listeners){
+        _p.push_back(l->get_port());
+    }
+    return _p;
 }

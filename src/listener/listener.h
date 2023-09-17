@@ -22,6 +22,14 @@
 #include <thread>
 #include <vector>
 
+enum SESSION_TYPE{
+    HTTP,
+    HTTPS,
+    WS,
+    WSS,
+    TCP,
+    UDP
+};
 
 namespace net = boost::asio;
 namespace beast = boost::beast;
@@ -29,18 +37,19 @@ using tcp = boost::asio::ip::tcp;
 
 class listener : public std::enable_shared_from_this<listener> {
 protected:
+    unsigned _port;
     net::io_context &_ioc;
     tcp::acceptor _acceptor;
     std::shared_ptr<std::string const> doc_root_;
     std::atomic<bool> stop_requested{false};
-
+    SESSION_TYPE _current_type=SESSION_TYPE::HTTP;
     void do_accept();
-
     void on_accept(beast::error_code ec, tcp::socket socket);
+    std::shared_ptr<session> get_session(SESSION_TYPE _type,tcp::socket socket);
 
 public:
-    listener(net::io_context &ioc, tcp::endpoint endpoint, std::shared_ptr<std::string const> const &doc_root)
-            : _ioc(ioc), _acceptor(net::make_strand(ioc)), doc_root_(doc_root) {
+    listener(net::io_context &ioc, tcp::endpoint endpoint)
+            : _port(endpoint.port()),_ioc(ioc), _acceptor(net::make_strand(ioc)) {
         beast::error_code er;
 
         _acceptor.open(endpoint.protocol(), er);
@@ -71,8 +80,8 @@ public:
     }
 
     void run();
-
     void stop();
+    unsigned int get_port() const;
 
 };
 

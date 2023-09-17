@@ -4,6 +4,7 @@
 #include "server.h"
 #include <stdlib.h>
 #include <ncurses.h>
+#include <vector>
 
 #include <boost/version.hpp>
 
@@ -22,6 +23,8 @@ int main(int argc, char *argv[]) {
 
     std::ifstream _icon("icon.txt");
     std::string icon;
+
+    std::vector<std::shared_ptr<server>> servers;
 
     // Check command line arguments.
     /*if (argc != 5) {
@@ -63,27 +66,55 @@ int main(int argc, char *argv[]) {
         }
 
         printf("%s\n%s\n%s\n%s\n",
-               "Choose option",
+               "Choose option:",
                "1. Create server instance",
                "2. List servers",
                "3. Errors",
                "e. Exit");
+
                     /* Print it on to the real screen */
+        std::string id,adr,ch2;
+        int i=0;
+        unsigned port;
         std::cin>>ch;
         try {
-            server _server_ins;
             switch (ch) {
                 // The io_context is required for all I/O
                 case '1':
-                    _server_ins.create_listeners(static_cast<std::string>("."));
-                    _server_ins.run_http();
-                    std::cout<<"Listener created"<<std::endl;
-                    getchar();
+                    system("clear");
+
+                    std::cout<<"Server ID: ";std::cin>>id;
+                    std::cout<<"IP address: ";std::cin>>adr;
+                    servers.push_back(std::make_shared<server>(id,adr));
                     break;
                 case '2':
-                    _server_ins.stop_listeners();
-                    std::cout<<"Stop listening"<<std::endl;
-                    getchar();
+                    while(ch2!="<") {
+
+                        for(const auto &s:servers){
+                        std::cout<<i++<<". Server: "<<s->get_ID()
+                        <<" address: "<<s->get_ip()
+                        <<" open ports: ";
+                        for(auto p:s->get_ports())
+                            std::cout<<p<<" | ";
+                        std::cout<<std::endl;
+                        }
+
+                        std::cout << "Choose server to edit or go back(<): ";
+                        std::cin >> ch2;
+                        system("clear");
+                        if(atoi(ch2.c_str())>=0&&atoi(ch2.c_str())<servers.size()) {
+                            std::cout << "Listener port: ";
+                            std::cin >> port;
+                            servers[atoi(ch2.c_str())]->create_listener(port,SESSION_TYPE::HTTP);
+                        }
+                        else {
+                            std::cout <<"Wrong option or server number" <<std::endl;
+                            getchar();
+                        }
+                        system("clear");
+                        i=0;
+                    }
+
                     break;
                 default:
                     break;

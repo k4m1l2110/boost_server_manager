@@ -32,6 +32,7 @@ public:
                           std::size_t bytes) = 0;
 
     virtual void do_close() = 0;
+
 };
 
 
