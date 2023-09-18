@@ -101,6 +101,8 @@ int main(int argc, char *argv[]) {
 
                         std::cout << "Choose server to edit or go back(<): ";
                         std::cin >> ch2;
+                        if(ch2=="<")
+                            break;
                         system("clear");
                         if(atoi(ch2.c_str())>=0&&atoi(ch2.c_str())<servers.size()) {
                             std::cout << "Listener port: ";

@@ -11,7 +11,7 @@ void server::run_listeners() {
                 _ioc.run();
             });
         }
-        _ioc.run();
+        //_ioc.run();
 
     } catch (std::exception& er) {
         throw er;
