@@ -65,12 +65,14 @@ int main(int argc, char *argv[]) {
             printw("\n\n"); // Move to the next line
         }
 
-        printf("%s\n%s\n%s\n%s\n",
+        printf(
+                "%s\n%s\n%s\n%s\n%s\n",
                "Choose option:",
                "1. Create server instance",
                "2. List servers",
                "3. Errors",
-               "e. Exit");
+               "e. Exit"
+               );
 
                     /* Print it on to the real screen */
         std::string id,adr,ch2;
@@ -82,7 +84,6 @@ int main(int argc, char *argv[]) {
                 // The io_context is required for all I/O
                 case '1':
                     system("clear");
-
                     std::cout<<"Server ID: ";std::cin>>id;
                     std::cout<<"IP address: ";std::cin>>adr;
                     servers.push_back(std::make_shared<server>(id,adr));
@@ -105,9 +106,7 @@ int main(int argc, char *argv[]) {
                             break;
                         system("clear");
                         if(atoi(ch2.c_str())>=0&&atoi(ch2.c_str())<servers.size()) {
-                            std::cout << "Listener port: ";
-                            std::cin >> port;
-                            servers[atoi(ch2.c_str())]->create_listener(port,SESSION_TYPE::HTTP);
+                            edit_server(servers[atoi(ch2.c_str())]);
                         }
                         else {
                             std::cout <<"Wrong option or server number" <<std::endl;

@@ -23,15 +23,20 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 #define _ADDR "0.0.0.0"
 
 
+
 class server : public std::enable_shared_from_this<server> {
+    friend void edit_server(const std::shared_ptr<server> &s);
 private:
     std::shared_ptr<session> _current_session;
-    std::string _ID;
     std::vector<std::shared_ptr<listener>> _listeners;
+    std::string _ID;
     net::ip::address _ip;
     net::io_context _ioc;
     unsigned _io_threads_num;
-    std::vector<std::thread> _threads;
+    std::thread _main_thread;
+
+    void run_listeners();
+    void stop_listeners();
 
 public:
     server(const std::string ID,const std::string addr = _ADDR, int io_threads = 1) :
@@ -41,11 +46,13 @@ public:
     const ip::address &get_ip() const;
     const std::string &get_ID() const;
     void create_listener(unsigned _port,SESSION_TYPE _type);
-    void run_listeners();
-    void stop_listeners();
+    void start_listeing();
+    void stop_listenening();
     std::vector<unsigned> get_ports();
 
 };
+
+void edit_server(const std::shared_ptr<server> &s);
 
 #endif
 

@@ -15,14 +15,23 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
         return; // To avoid infinite loop
     } else {
         // Create the session and run it
-        get_session(_current_type,std::move(socket))->run();
+        auto session=get_session(_current_type,std::move(socket));
+        session->run();
+        std::cout<<"Start accepting\n";
     }
-    // Accept another connection
-    do_accept();
+    if (!stop_requested.load()) {
+        do_accept();
+    } else {
+        // If stopping, cancel any pending operations in the session
+        socket.cancel();
+        // Close the socket to initiate the close sequence
+        socket.close();
+    }
 }
 
 void listener::run() {
     do_accept();
+
 }
 
 void listener::stop() {
@@ -38,9 +47,9 @@ std::shared_ptr<session> listener::get_session(SESSION_TYPE _type,tcp::socket so
     std::string doc_root;
     switch(_type){
         case SESSION_TYPE::HTTP:
-            std::cout<<"Set document root: ";std::cin>>doc_root;
-            return http_session::create_session(std::move(socket),doc_root);
+            //std::cout<<"Set document root: ";std::cin>>doc_root;
+            return http_session::create_session(std::move(socket),".");
         default:
-            break;
+            return nullptr;
     }
 }
