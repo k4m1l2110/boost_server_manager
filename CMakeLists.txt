@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.6)
 project(WebServer)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -20,6 +20,7 @@ add_executable(WebServer
         src/main.cpp
         src/session/http_session.cpp
         src/listener/listener.cpp
+        src/session/ws_session.cpp
 )
 
 target_link_libraries(WebServer ${Boost_LIBRARIES})
