@@ -20,13 +20,17 @@ protected:
     beast::flat_buffer _buffer;
 public:
     session(tcp::socket &&socket) : _tcp_stream(std::move(socket)) {}
-
+    session();
     virtual void run() = 0;
+
+    virtual void on_run() = 0;
 
     virtual void do_read() = 0;
 
     virtual void on_read(beast::error_code er,
                          std::size_t bytes) = 0;
+
+    virtual void on_accept(beast::error_code er) = 0;
 
     virtual void on_write(beast::error_code er,
                           std::size_t bytes) = 0;

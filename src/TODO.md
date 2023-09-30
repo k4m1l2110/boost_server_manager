@@ -1,0 +1,8 @@
+- Fix session closing []
+- Add html GUI []
+- Add encrypted sessions:
+  - WSS []
+  - HTTPS []
+- Add basic session:
+  - TCP []
+  - UDP []

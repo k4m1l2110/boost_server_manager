@@ -41,7 +41,7 @@ private:
 public:
     server(const std::string ID,const std::string addr = _ADDR, int io_threads = 1) :
             _ID(ID),_ip(net::ip::make_address(addr)), _ioc(std::max<int>(1, io_threads)), _io_threads_num
-            (io_threads) {}
+            (io_threads) {std::cout<<"Server created on address: "<<addr<<std::endl;}
 
     const ip::address &get_ip() const;
     const std::string &get_ID() const;
