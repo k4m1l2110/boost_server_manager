@@ -6,6 +6,7 @@
 #define WEBSERVER_LISTENER_H
 
 #include "../session/http_session.h"
+#include "../session/ws_session.h"
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
@@ -21,6 +22,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+
 
 enum SESSION_TYPE{
     HTTP,
@@ -73,6 +75,7 @@ public:
         // Start listening for connections
         _acceptor.listen(
                 net::socket_base::max_listen_connections, er);
+
         if (er) {
             fail(er, "listen");
             return;

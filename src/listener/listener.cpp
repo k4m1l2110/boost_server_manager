@@ -7,9 +7,11 @@ void listener::do_accept() {
             beast::bind_front_handler(
                     &listener::on_accept,
                     shared_from_this()));
+
 }
 
 void listener::on_accept(beast::error_code ec, tcp::socket socket) {
+
     if (ec) {
         fail(ec, "accept");
         return; // To avoid infinite loop
@@ -31,7 +33,6 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
 
 void listener::run() {
     do_accept();
-
 }
 
 void listener::stop() {
