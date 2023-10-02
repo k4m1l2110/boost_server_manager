@@ -17,7 +17,7 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
         return; // To avoid infinite loop
     } else {
         // Create the session and run it
-        auto session=get_session(_current_type,std::move(socket));
+        auto session=get_session(std::move(socket));
         session->run();
         std::cout<<"Start accepting\n";
     }
@@ -44,13 +44,17 @@ unsigned int listener::get_port() const {
     return _port;
 }
 
-std::shared_ptr<session> listener::get_session(SESSION_TYPE _type,tcp::socket socket){
+std::shared_ptr<session> listener::get_session(tcp::socket socket){
     std::string doc_root;
-    switch(_type){
+    switch(_current_type){
         case SESSION_TYPE::HTTP:
             //std::cout<<"Set document root: ";std::cin>>doc_root;
-            return http_session::create_session(std::move(socket),".");
+            return http_session::create_session(std::move(socket),doc_root_);
         default:
             return nullptr;
     }
+}
+
+void listener::set_doc_root(std::string &docRoot) {
+    doc_root_ = docRoot;
 }

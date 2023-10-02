@@ -24,7 +24,7 @@
 #include <vector>
 
 
-enum SESSION_TYPE{
+enum SESSION_TYPE {
     HTTP,
     HTTPS,
     WS,
@@ -42,16 +42,24 @@ protected:
     unsigned _port;
     net::io_context &_ioc;
     tcp::acceptor _acceptor;
-    std::shared_ptr<std::string const> doc_root_;
+    std::string doc_root_=".";
     std::atomic<bool> stop_requested{false};
-    SESSION_TYPE _current_type=SESSION_TYPE::HTTP;
+    SESSION_TYPE _current_type;
+
     void do_accept();
+
     void on_accept(beast::error_code ec, tcp::socket socket);
-    std::shared_ptr<session> get_session(SESSION_TYPE _type,tcp::socket socket);
 
 public:
-    listener(net::io_context &ioc, tcp::endpoint endpoint)
-            : _port(endpoint.port()),_ioc(ioc), _acceptor(net::make_strand(ioc)) {
+
+
+protected:
+
+    std::shared_ptr<session> get_session(tcp::socket socket);
+
+public:
+    listener(net::io_context &ioc, tcp::endpoint endpoint, SESSION_TYPE _type = SESSION_TYPE::HTTP)
+            : _port(endpoint.port()), _ioc(ioc), _acceptor(net::make_strand(ioc)), _current_type(_type) {
         beast::error_code er;
 
         _acceptor.open(endpoint.protocol(), er);
@@ -82,8 +90,12 @@ public:
         }
     }
 
+    void set_doc_root(std::string &docRoot);
+
     void run();
+
     void stop();
+
     unsigned int get_port() const;
 
 };

@@ -45,12 +45,14 @@ void server::run_listeners() {
     }
 }
 
-void server::create_listener(unsigned _port,SESSION_TYPE _type) {
+void server::create_listener(unsigned _port,SESSION_TYPE _type,std::string doc_root) {
     auto new_listener = std::make_shared<listener>(
             _ioc,
-            tcp::endpoint(_ip,_port)
+            tcp::endpoint(_ip,_port),
+            _type
             );
-
+    if(!doc_root.empty())
+        new_listener->set_doc_root(doc_root);
     new_listener->run();
 
     _listeners.push_back(new_listener);

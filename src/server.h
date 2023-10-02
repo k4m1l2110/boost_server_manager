@@ -45,10 +45,12 @@ public:
 
     const ip::address &get_ip() const;
     const std::string &get_ID() const;
-    void create_listener(unsigned _port,SESSION_TYPE _type);
+    std::vector<unsigned> get_ports();
+    void set_doc_root(const std::string &s);
+    void create_listener(unsigned _port,SESSION_TYPE _type,std::string doc_root="");
     void start_listeing();
     void stop_listenening();
-    std::vector<unsigned> get_ports();
+
 
 };
 
