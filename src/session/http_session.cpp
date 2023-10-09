@@ -184,7 +184,6 @@ http_session::handle_post(
 
         return handler->second(req[http::field::content_type],req.body());
     } else {
-
         return not_found(req.target());
     }
 }
@@ -225,7 +224,7 @@ void http_session::on_read(beast::error_code er, std::size_t bytes) {
     if (_request.method() == http::verb::get)
         send_response(handle_get(*_doc_root,
                                  std::move(_request)));
-    else
+    else if(_request.method() == http::verb::post)
         send_response(handle_post(std::move(_request)));
 }
 

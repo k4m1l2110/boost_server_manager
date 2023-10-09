@@ -44,13 +44,12 @@ protected:
     tcp::acceptor _acceptor;
     std::string doc_root_=".";
     std::atomic<bool> stop_requested{false};
+    std::unordered_map<std::string,request_handler> http_request_handlers;
     SESSION_TYPE _current_type;
 
     void do_accept();
 
     void on_accept(beast::error_code ec, tcp::socket socket);
-
-public:
 
 
 protected:
@@ -93,6 +92,8 @@ public:
     void set_doc_root(std::string &docRoot);
 
     void run();
+
+    void insert_handlers(std::unordered_map<std::string,request_handler> &handlers);
 
     void stop();
 

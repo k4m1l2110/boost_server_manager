@@ -10,15 +10,22 @@ void listener::do_accept() {
 
 }
 
+void listener::insert_handlers(std::unordered_map<std::string,request_handler> &handlers) {
+    http_request_handlers=handlers;
+}
+
 void listener::on_accept(beast::error_code ec, tcp::socket socket) {
 
     if (ec) {
         fail(ec, "accept");
         return; // To avoid infinite loop
     } else {
+
         // Create the session and run it
         auto session=get_session(std::move(socket));
-        session->run();
+        if(!http_request_handlers.empty())
+            session->request_handlers=http_request_handlers;
+            session->run();
         std::cout<<"Start accepting\n";
     }
     if (!stop_requested.load()) {
