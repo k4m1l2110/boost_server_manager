@@ -29,7 +29,13 @@ int main(int argc, char *argv[]) {
 
 
         std::vector<std::shared_ptr<server>> servers;
-
+        gui_server->insert_handlers(8080, "/test",
+                                    [](beast::basic_string_view<char> request_type, std::string req)-> http::response<http::string_body> {
+                                        std::cout << "Received Request Body: " << req << std::endl;
+                                        http::response<http::string_body> res;
+                                        res.version(11);
+                                        return res;
+                                    });
 
 
         gui_server->start_listeing();

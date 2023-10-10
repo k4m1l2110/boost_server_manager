@@ -95,3 +95,17 @@ std::vector<unsigned> server::get_ports(){
     }
     return _p;
 }
+
+bool server::insert_handlers(unsigned listener_port,std::string path,request_handler handler) {
+    auto c_listener=std::find_if(_listeners.begin(),_listeners.end(),[&listener_port](std::shared_ptr<listener> l){
+        return listener_port==l->get_port();
+    });
+    if(c_listener!=_listeners.end()) {
+        (*c_listener)->insert_handler(path, handler);
+        return 1;
+    }
+    else {
+        std::cout << "Path not found" << std::endl;//FIXME: change to log into error logger
+        return 0;
+        }
+}

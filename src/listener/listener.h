@@ -38,6 +38,7 @@ namespace beast = boost::beast;
 using tcp = boost::asio::ip::tcp;
 
 class listener : public std::enable_shared_from_this<listener> {
+
 protected:
     unsigned _port;
     net::io_context &_ioc;
@@ -93,7 +94,7 @@ public:
 
     void run();
 
-    void insert_handlers(std::unordered_map<std::string,request_handler> &handlers);
+    void insert_handler(std::string path,request_handler handler);
 
     void stop();
 

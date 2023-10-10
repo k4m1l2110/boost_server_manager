@@ -23,9 +23,9 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 #define _ADDR "0.0.0.0"
 
 
-
 class server : public std::enable_shared_from_this<server> {
     friend void edit_server(const std::shared_ptr<server> &s);
+
 private:
     std::shared_ptr<session> _current_session;
     std::vector<std::shared_ptr<listener>> _listeners;
@@ -36,21 +36,29 @@ private:
     std::thread _main_thread;
 
     void run_listeners();
+
     void stop_listeners();
 
 public:
-    server(const std::string ID,const std::string addr = _ADDR, int io_threads = 1) :
-            _ID(ID),_ip(net::ip::make_address(addr)), _ioc(std::max<int>(1, io_threads)), _io_threads_num
-            (io_threads) {std::cout<<"Server created on address: "<<addr<<std::endl;}
+    server(const std::string ID, const std::string addr = _ADDR, int io_threads = 1) :
+            _ID(ID), _ip(net::ip::make_address(addr)), _ioc(std::max<int>(1, io_threads)), _io_threads_num
+            (io_threads) { std::cout << "Server created on address: " << addr << std::endl; }
 
     const ip::address &get_ip() const;
+
     const std::string &get_ID() const;
+
     std::vector<unsigned> get_ports();
+
     void set_doc_root(const std::string &s);
-    void create_listener(unsigned _port,SESSION_TYPE _type,std::string doc_root="");
+
+    void create_listener(unsigned _port, SESSION_TYPE _type, std::string doc_root = "");
+
     void start_listeing();
+
     void stop_listenening();
 
+    bool insert_handlers(unsigned listener_port,std::string path, request_handler handler);
 
 };
 

@@ -181,9 +181,10 @@ http_session::handle_post(
         res.set(boost::beast::http::field::server, "Boost HTTP Server");
         res.body() = "Response body";
         res.prepare_payload();*/
-
+        std::cout<<req.body()<<std::endl;
         return handler->second(req[http::field::content_type],req.body());
     } else {
+        std::cout<<"Not found"<<std::endl;
         return not_found(req.target());
     }
 }
@@ -221,11 +222,15 @@ void http_session::on_read(beast::error_code er, std::size_t bytes) {
         return do_close();
     if (er)
         return fail(er, "read");
-    if (_request.method() == http::verb::get)
+    if (_request.method() == http::verb::get) {
+        std::cout<<"GET"<<std::endl;
         send_response(handle_get(*_doc_root,
                                  std::move(_request)));
-    else if(_request.method() == http::verb::post)
+    }
+    else if (_request.method() == http::verb::post){
+        std::cout<<"POST"<<std::endl;
         send_response(handle_post(std::move(_request)));
+    }
 }
 
 void http_session::on_write(beast::error_code er, std::size_t bytes) {
@@ -256,8 +261,8 @@ void http_session::send_response(http::message_generator &&ms) {
     );
 }
 
-std::shared_ptr<session> http_session::create_session(tcp::socket socket, std::string doc_root) {
-    return std::make_shared<http_session>(std::move(socket), std::make_shared<std::string const>(doc_root));
+std::shared_ptr<session> http_session::create_session(tcp::socket socket, std::string doc_root,std::unordered_map<std::string,request_handler> &r_handlers) {
+    return std::make_shared<http_session>(std::move(socket), std::make_shared<std::string const>(doc_root),r_handlers);
 }
 
 

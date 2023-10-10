@@ -10,8 +10,8 @@ void listener::do_accept() {
 
 }
 
-void listener::insert_handlers(std::unordered_map<std::string,request_handler> &handlers) {
-    http_request_handlers=handlers;
+void listener::insert_handler(std::string path,request_handler handler){
+http_request_handlers.insert(std::make_pair(path,handler));
 }
 
 void listener::on_accept(beast::error_code ec, tcp::socket socket) {
@@ -23,10 +23,8 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
 
         // Create the session and run it
         auto session=get_session(std::move(socket));
-        if(!http_request_handlers.empty())
-            session->request_handlers=http_request_handlers;
-            session->run();
         std::cout<<"Start accepting\n";
+        session->run();
     }
     if (!stop_requested.load()) {
         do_accept();
@@ -56,7 +54,7 @@ std::shared_ptr<session> listener::get_session(tcp::socket socket){
     switch(_current_type){
         case SESSION_TYPE::HTTP:
             //std::cout<<"Set document root: ";std::cin>>doc_root;
-            return http_session::create_session(std::move(socket),doc_root_);
+            return http_session::create_session(std::move(socket),doc_root_, http_request_handlers);
         default:
             return nullptr;
     }

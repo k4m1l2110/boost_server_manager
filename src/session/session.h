@@ -15,17 +15,13 @@ namespace beast = boost::beast;
 using tcp = boost::asio::ip::tcp;
 namespace http = boost::beast::http;
 
-using request_handler = std::function<http::response<http::string_body>(
-        beast::basic_string_view<char> reques_type,
-        std::string request_body
-)>;
+
 
 class session : public std::enable_shared_from_this<session> {
-    friend class listener;
 protected:
     beast::tcp_stream _tcp_stream;
     beast::flat_buffer _buffer;
-    std::unordered_map<std::string,request_handler> request_handlers;
+
 public:
     session(tcp::socket &&socket) : _tcp_stream(std::move(socket)) {}
     session();
