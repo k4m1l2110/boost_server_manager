@@ -181,7 +181,6 @@ http_session::handle_post(
         res.set(boost::beast::http::field::server, "Boost HTTP Server");
         res.body() = "Response body";
         res.prepare_payload();*/
-        std::cout<<req.body()<<std::endl;
         return handler->second(req[http::field::content_type],req.body());
     } else {
         std::cout<<"Not found"<<std::endl;
