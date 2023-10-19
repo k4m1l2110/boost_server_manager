@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     std::ifstream _icon("icon.txt");
     std::string icon;
     std::shared_ptr<server> gui_server = std::make_shared<server>("MAIN", "0.0.0.0");
-    gui_server->create_listener(8080, SESSION_TYPE::HTTP);
+    gui_server->create_listener(8080, SESSION_TYPE::HTTPS,"/home/kamil/Projekty/C_C++/CPP/WebServer/webtool_manager");
     try {
 
 

@@ -6,7 +6,9 @@
 #define WEBSERVER_LISTENER_H
 
 #include "../session/http_session.h"
+#include "../session/https_session.h"
 #include "../session/ws_session.h"
+#include "../test_ssl/server_cert.hpp"
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
@@ -42,6 +44,7 @@ class listener : public std::enable_shared_from_this<listener> {
 protected:
     unsigned _port;
     net::io_context &_ioc;
+    ssl::context &ssl_ctx;
     tcp::acceptor _acceptor;
     std::string doc_root_=".";
     std::atomic<bool> stop_requested{false};
@@ -58,9 +61,12 @@ protected:
     std::shared_ptr<session> get_session(tcp::socket socket);
 
 public:
-    listener(net::io_context &ioc, tcp::endpoint endpoint, SESSION_TYPE _type = SESSION_TYPE::HTTP)
-            : _port(endpoint.port()), _ioc(ioc), _acceptor(net::make_strand(ioc)), _current_type(_type) {
+    listener(net::io_context &ioc, tcp::endpoint endpoint, SESSION_TYPE _type = SESSION_TYPE::HTTP,ssl::context s_ctx = ssl::context(ssl::context::tlsv12))
+            : _port(endpoint.port()), _ioc(ioc), _acceptor(net::make_strand(ioc)), _current_type(_type), ssl_ctx(s_ctx) {
         beast::error_code er;
+
+        if(_type==SESSION_TYPE::HTTPS)
+            load_server_certificate(ssl_ctx);
 
         _acceptor.open(endpoint.protocol(), er);
         if (er) {

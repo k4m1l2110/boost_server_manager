@@ -41,6 +41,7 @@ public:
 
     virtual void do_close() = 0;
 
+    virtual void on_handshake(beast::error_code er)=0;
 };
 
 
