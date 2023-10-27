@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Website Title</title>
+    <style>
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+
+        .banner {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: 10%;
+            background-color: #333;
+            color: #fff;
+        }
+
+
+        .title {
+            font-size: 24px;
+            margin-left: 20px;
+        }
+
+
+        .navbar {
+            list-style-type: none;
+            display: flex;
+            margin-right: 20px;
+        }
+
+
+        .navbar li {
+            margin-right: 15px;
+            display: flex; /* Enable flex properties */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+
+
+        .navbar li:hover {
+            background-color: #555; /* Background color on hover */
+            cursor: pointer; /* Change cursor on hover to indicate interactivity */
+        }
+
+
+        .navbar li:active {
+            background-color: #777; /* Background color on click */
+        }
+
+
+        .container {
+            height: 90%;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+        }
+
+
+        .server_list {
+            border-right: solid black 1px;
+            display: flex;
+            flex-direction: column;
+
+        }
+
+        .server_list > ul {
+            padding: 0;
+            margin: 0;
+        }
+
+
+        .server_list li {
+            padding: 10px;
+            display: flex; /* Enable flex properties */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+
+
+        .server_list li:hover {
+            background-color: #555; /* Background color on hover */
+            cursor: pointer; /* Change cursor on hover to indicate interactivity */
+        }
+
+
+        .server_list li:active {
+            background-color: #777; /* Background color on click */
+        }
+
+        #list_buttons {
+            background-color: #777;
+        }
+
+        #content {
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+            height: 100%;
+        }
+
+        .add-listener-button {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #000;
+            padding: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .add-listener-button:hover {
+            background-color: #ccc;
+        }
+
+        .listener-form {
+            margin-top: 10px;
+        }
+
+        .listener-form form {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .listener-form form label {
+            text-align: right;
+        }
+
+        .listener-form form input {
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .listener-form form button {
+            padding: 5px 10px;
+            background-color: #0074d9;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .listener-form form button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+<div class="banner">
+    <h1 class="title">Server Manager</h1>
+    <ul class="navbar">
+        <li>Server lists</li>
+        <li>Database</li>
+        <li>FTP</li>
+        <li>CLI</li>
+    </ul>
+</div>
+<!-- Server list container -->
+<section class="container">
+    <nav class="server_list">
+        <ul>
+            <li id="list_buttons">
+                <img id="add" src="res/plus-square.svg"/>
+            </li>
+        </ul>
+    </nav>
+    <div id="content">
+        <h1>Create or choose server instance</h1>
+    </div>
+</section>
+<script>
+    const addr = "https://0.0.0.0:8080"
+
+    function setCookie(name, value, expirationDays) {
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + expirationDays);
+
+        const expires = `expires=${expirationDate.toUTCString()}`;
+
+        document.cookie = `${name}=${value}; ${expires}; Secure; HttpOnly; SameSite=Strict`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const serverList = document.querySelector(".server_list ul");
+
+        fetch(addr + "/api/get_servers", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                data.servers.forEach(server => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = server;
+
+                    listItem.addEventListener("click", function () {
+                        const content = document.getElementById("content");
+                        content.innerHTML = `
+                        <div style="height: 100%; width: 100%; display: grid; grid-template-rows: 25% repeat(5, 15%);">
+                            <h2 style="margin: 0; height: 100%; width: 100%; font-size: xxx-large; border-bottom: black solid 1px">Server address: ${data.address}</h2>
+                            <div>
+                                <div class="add-listener-button">
+                                    <img id="add_endp" src="res/plus-circle.svg" />
+                                    Add listener
+                                </div>
+                                <div class="listener-form" style="display: none;">
+                                    <form>
+                                        <label for="port">Port:</label>
+                                        <input type="text" id="port" name="port" required>
+                                        <label for="method">Method:</label>
+                                        <input type="text" id="method" name="method" required>
+                                        <button type="submit">Save</button>
+                                    </form>
+                                </div>
+                                ${data.ports
+                            ? `<div>
+                                        ${data.ports
+                                .map(port => `<div style="border: 1px solid black;">Port: ${port}</div>`)
+                                .join('')}
+                                    </div>`
+                            : `<div>No listeners created yet.</div>`
+                        }
+                            </div>
+                        </div>
+                    `;
+
+                        const addListenerButton = content.querySelector(".add-listener-button");
+                        const listenerForm = content.querySelector(".listener-form");
+
+                        addListenerButton.addEventListener("click", function () {
+                            listenerForm.style.display = "block";
+                            // Add your logic to handle form submission here
+                        });
+
+                    });
+
+                    serverList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching server data:", error);
+            });
+    });
+
+
+    document.getElementById("add").addEventListener("click", function () {
+        const form = document.createElement("form");
+        form.style = `
+        background-color: lightgray;
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        position:relative;
+        top: 25%;
+        height: 50%;
+        width: 60%; /* Set the width to a smaller value */
+        margin: 0 auto; /* Center horizontally */
+    `;
+
+        const serverIdInput = document.createElement("input");
+        serverIdInput.type = "text";
+        serverIdInput.placeholder = "Server ID";
+        serverIdInput.name = "server_id";
+        serverIdInput.style = `
+        width: 100%;
+        height: 10%;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: border 0.3s;
+    `;
+
+        const serverAddressInput = document.createElement("input");
+        serverAddressInput.type = "text";
+        serverAddressInput.placeholder = "Server address";
+        serverAddressInput.name = "server_address";
+        serverAddressInput.style = `
+        width: 100%;
+        height: 10%;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        transition: border 0.3s;
+    `;
+
+        const submitButton = document.createElement("button");
+        submitButton.type = "submit";
+        submitButton.textContent = "Submit";
+        submitButton.style = `
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    `;
+
+        serverIdInput.addEventListener("focus", function () {
+            serverIdInput.style.border = "1px solid #007bff";
+        });
+
+        serverIdInput.addEventListener("blur", function () {
+            serverIdInput.style.border = "1px solid #ccc";
+        });
+
+        serverAddressInput.addEventListener("focus", function () {
+            serverAddressInput.style.border = "1px solid #007bff";
+        });
+
+        serverAddressInput.addEventListener("blur", function () {
+            serverAddressInput.style.border = "1px solid #ccc";
+        });
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const serverId = serverIdInput.value;
+            const serverAddress = serverAddressInput.value;
+
+            const requestData = {
+                id: serverId,
+                address: serverAddress
+            };
+
+            fetch(addr + "/api/create_server", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Server created:", data);
+                });
+
+            console.log("Sending data:", requestData);
+
+            serverIdInput.value = "";
+            serverAddressInput.value = "";
+        });
+
+        form.appendChild(serverIdInput);
+        form.appendChild(serverAddressInput);
+        form.appendChild(submitButton);
+
+        const content = document.getElementById("content");
+        content.innerHTML = "";
+        content.appendChild(form);
+    });
+
+
+</script>
+</body>
+</html>
