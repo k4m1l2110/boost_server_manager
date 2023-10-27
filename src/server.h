@@ -24,14 +24,13 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 
 class server : public std::enable_shared_from_this<server> {
-    friend void edit_server(const std::shared_ptr<server> &s);
-
 private:
     std::shared_ptr<session> _current_session;
     std::vector<std::shared_ptr<listener>> _listeners;
     std::string _ID;
     net::ip::address _ip;
     net::io_context _ioc;
+    ssl::context _ssl_ctx;
     unsigned _io_threads_num;
     std::thread _main_thread;
 
@@ -42,7 +41,8 @@ private:
 public:
     server(const std::string ID, const std::string addr = _ADDR, int io_threads = 1) :
             _ID(ID), _ip(net::ip::make_address(addr)), _ioc(std::max<int>(1, io_threads)), _io_threads_num
-            (io_threads) { std::cout << "Server created on address: " << addr << std::endl; }
+            (io_threads), _ssl_ctx(ssl::context::tlsv12)
+            { std::cout << "Server created on address: " << addr << std::endl; }
 
     const ip::address &get_ip() const;
 
