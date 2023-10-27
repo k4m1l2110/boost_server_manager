@@ -94,8 +94,8 @@ void ws_session::on_write(beast::error_code er, std::size_t bytes) {
     _ws_stream..socket().shutdown(tcp::socket::shutdown_send, er);
 }*/
 
-/*std::shared_ptr<session> ws_session::create_session(tcp::socket socket) {
-    return std::make_shared<ws_session>(std::move(socket));
-}*/
+std::shared_ptr<session> ws_session::create_session(tcp::socket socket) {
+    return std::static_pointer_cast<session>(std::make_shared<ws_session>(std::move(socket)));
+}
 
 

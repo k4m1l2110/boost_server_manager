@@ -26,7 +26,7 @@ class ws_session : public session {
     websocket::stream<beast::tcp_stream> _ws_stream;
 public:
     ws_session(tcp::socket &&socket)
-            : _ws_stream(std::move(socket)){;}
+            : session(std::move(boost::asio::ip::tcp::socket(boost::asio::io_context(1).get_executor()))),_ws_stream(std::move(socket)){;}
 
     void run() override;
 
@@ -46,7 +46,7 @@ public:
 
     static std::shared_ptr<session> create_session(tcp::socket socket);
 
-
+    void on_handshake(beast::error_code er) override {;}
 };
 
 
