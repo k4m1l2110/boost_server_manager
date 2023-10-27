@@ -44,7 +44,7 @@ class listener : public std::enable_shared_from_this<listener> {
 protected:
     unsigned _port;
     net::io_context &_ioc;
-    ssl::context &ssl_ctx;
+    ssl::context ssl_ctx;
     tcp::acceptor _acceptor;
     std::string doc_root_=".";
     std::atomic<bool> stop_requested{false};
@@ -62,7 +62,7 @@ protected:
 
 public:
     listener(net::io_context &ioc, tcp::endpoint endpoint, SESSION_TYPE _type = SESSION_TYPE::HTTP,ssl::context s_ctx = ssl::context(ssl::context::tlsv12))
-            : _port(endpoint.port()), _ioc(ioc), _acceptor(net::make_strand(ioc)), _current_type(_type), ssl_ctx(s_ctx) {
+            : _port(endpoint.port()), _ioc(ioc), _acceptor(net::make_strand(ioc)), _current_type(_type), ssl_ctx(ssl::context(ssl::context::tlsv13)) {
         beast::error_code er;
 
         if(_type==SESSION_TYPE::HTTPS)

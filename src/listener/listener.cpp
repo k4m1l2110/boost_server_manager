@@ -53,11 +53,11 @@ std::shared_ptr<session> listener::get_session(tcp::socket socket){
     std::string doc_root;
     switch(_current_type){
         case SESSION_TYPE::HTTP:
-            //std::cout<<"Set document root: ";std::cin>>doc_root;
             return http_session::create_session(std::move(socket),doc_root_, http_request_handlers);
         case SESSION_TYPE::HTTPS:
-            //std::cout<<"Set document root: ";std::cin>>doc_root;
             return https_session::create_session(std::move(socket),doc_root_,http_request_handlers,ssl_ctx);
+        case SESSION_TYPE::WS:
+            return ws_session::create_session(std::move(socket));
         default:
             return nullptr;
     }
@@ -66,4 +66,3 @@ std::shared_ptr<session> listener::get_session(tcp::socket socket){
 void listener::set_doc_root(std::string &docRoot) {
     doc_root_ = docRoot;
 }
-
