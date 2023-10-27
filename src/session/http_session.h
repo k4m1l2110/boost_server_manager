@@ -18,7 +18,7 @@
 namespace net = boost::asio;
 namespace http = boost::beast::http;
 namespace ip = boost::asio::ip;
-namespace beast = boost::beast;         // from <boost/beast.hpp>
+namespace beast = boost::beast;
 using tcp = boost::asio::ip::tcp;
 
 using request_handler = std::function<http::response<http::string_body>(
@@ -28,9 +28,12 @@ using request_handler = std::function<http::response<http::string_body>(
 
 class http_session : public session {
     friend class listener;
-    std::shared_ptr<std::string const> _doc_root;
+
+    friend class https_session;
+
     http::request<http::string_body> _request;
-    std::unordered_map<std::string,request_handler> request_handlers;
+    std::shared_ptr<std::string const> _doc_root;
+    std::unordered_map<std::string, request_handler> request_handlers;
 
     template<class Body, class Allocator>
     http::message_generator
@@ -52,21 +55,27 @@ class http_session : public session {
 
     void do_close() override;
 
-    void send_response(http::message_generator &&ms);
+    virtual void send_response(http::message_generator &&ms);
 
     //Dont use on http
     void on_accept(beast::error_code er) override { ; }
 
     //Dont use on http
     void on_run() override { ; }
+
+    void on_handshake(beast::error_code er) override { ; }
+
 public:
-    http_session(tcp::socket &&socket, std::shared_ptr<std::string const> const &doc_root,std::unordered_map<std::string,request_handler> &r_handlers)
-            : session(std::move(socket)), _doc_root(doc_root),request_handlers(r_handlers) { ; }
+
+    http_session(tcp::socket &&socket, std::shared_ptr<std::string const> const &doc_root,
+                 std::unordered_map<std::string, request_handler> &r_handlers)
+            : session(std::move(socket)), _doc_root(doc_root), request_handlers(r_handlers) { ; }
 
 
     void run() override;
 
-    static std::shared_ptr<session> create_session(tcp::socket socket, std::string doc_root,std::unordered_map<std::string,request_handler> &r_handlers);
+    static std::shared_ptr<session> create_session(tcp::socket socket, std::string doc_root,
+                                                   std::unordered_map<std::string, request_handler> &r_handlers);
 
 
 };

@@ -155,32 +155,6 @@ http_session::handle_post(
         if (er)
             return server_error(er.message());
 
-        /*// Respond to HEAD request
-        boost::beast::http::response<boost::beast::http::string_body> res;
-        // Parse the POST data into a map
-        std::unordered_map<std::string, std::string> postData;
-        std::string data = req.body();
-        std::istringstream iss(data);
-        // Parse the data into key-value pairs
-        std::string key, value;
-        while (std::getline(iss, key, '&')) {
-            size_t equalsPos = key.find('=');
-            if (equalsPos != std::string::npos) {
-                value = key.substr(equalsPos + 1);
-                key = key.substr(0, equalsPos);
-                std::cout << key << " " << value << std::endl;
-                // URL decode the value if needed
-                // (e.g., replace '+' with ' ' and percent-encoded characters)
-                // You can use a URL decoding library for this.
-                postData[key] = value;
-            }
-        }
-
-        res.version(req.version());
-        res.result(boost::beast::http::status::ok);
-        res.set(boost::beast::http::field::server, "Boost HTTP Server");
-        res.body() = "Response body";
-        res.prepare_payload();*/
         return handler->second(req[http::field::content_type],req.body());
     } else {
         std::cout<<"Not found"<<std::endl;
@@ -216,11 +190,12 @@ void http_session::do_read() {
 
 void http_session::on_read(beast::error_code er, std::size_t bytes) {
     boost::ignore_unused(bytes);
-
+    std::cout<<_request.method()<<std::endl;
     if (er == http::error::end_of_stream)
         return do_close();
     if (er)
         return fail(er, "read");
+
     if (_request.method() == http::verb::get) {
         std::cout<<"GET"<<std::endl;
         send_response(handle_get(*_doc_root,
