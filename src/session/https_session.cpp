@@ -5,7 +5,7 @@
 #include "https_session.h"
 
 void https_session::run() {
-    net::dispatch(_tcp_stream.get_executor(),
+    net::dispatch(_ssl_stream.get_executor(),
                   beast::bind_front_handler(
                           [self = shared_from_this()]() {
                               self->on_run();
@@ -17,11 +17,11 @@ void https_session::run() {
 void
 https_session::on_run() {
     // Set the timeout.
-    beast::get_lowest_layer(ssl_stream).expires_after(
+    beast::get_lowest_layer(_ssl_stream).expires_after(
             std::chrono::seconds(30));
 
     // Perform the SSL handshake
-    ssl_stream.async_handshake(
+    _ssl_stream.async_handshake(
             ssl::stream_base::server,
             beast::bind_front_handler(
                     &session::on_handshake,
@@ -31,8 +31,8 @@ https_session::on_run() {
 void
 https_session::on_handshake(beast::error_code ec)
 {
-    if(ec)
-        return fail(ec, "handshake");
+    /*if(ec)
+        return fail(ec, "handshake");*/
 
     do_read();
 }
@@ -41,13 +41,31 @@ void https_session::do_read() {
     _request = {};
 
     // Set the timeout.
-    beast::get_lowest_layer(ssl_stream).expires_after(std::chrono::seconds(30));
+    beast::get_lowest_layer(_ssl_stream).expires_after(std::chrono::seconds(30));
 
-    // Read a request
-    http::async_read(ssl_stream, _buffer, _request,
+    http::async_read(_ssl_stream,
+                     _buffer,
+                     _request,
                      beast::bind_front_handler(
-                             &session::on_read,
-                             shared_from_this()));
+                             [self = shared_from_this()](beast::error_code er, std::size_t bytes) {
+                                 self->on_read(er, bytes);
+                             }
+                     )
+    );
+}
+
+void https_session::send_response(http::message_generator &&ms) {
+    bool keep_alive = ms.keep_alive();
+
+    beast::async_write(
+            _ssl_stream,
+            std::move(ms),
+            beast::bind_front_handler(
+                    [self = shared_from_this()](beast::error_code er, std::size_t bytes) {
+                        self->on_write(er, bytes);
+                    }
+            )
+    );
 }
 
 std::shared_ptr<session> https_session::create_session(
