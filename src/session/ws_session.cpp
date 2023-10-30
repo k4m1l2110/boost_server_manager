@@ -14,19 +14,15 @@ void ws_session::run() {
 }
 
 void ws_session::on_run() {
-    // Set suggested timeout settings for the websocket
     _ws_stream.set_option(
             websocket::stream_base::timeout::suggested(
                     beast::role_type::server));
-
-    // Set a decorator to change the Server of the handshake
     _ws_stream.set_option(websocket::stream_base::decorator(
             [](websocket::response_type &res) {
                 res.set(http::field::server,
                         std::string(BOOST_BEAST_VERSION_STRING) +
                         " websocket-server-async");
             }));
-    // Accept the websocket handshake
     _ws_stream.async_accept(
             beast::bind_front_handler(
                     [self = shared_from_this()](beast::error_code er) {
@@ -38,17 +34,16 @@ void ws_session::on_run() {
 
 void ws_session::on_accept(beast::error_code er)
 {
+    std::cout<<"accept"<<std::endl;
     if(er)
         return fail(er, "accept");
 
-    // Read a message
     do_read();
 }
 
 
 void ws_session::do_read() {
 
-    // Read a message into our buffer
     _ws_stream.async_read(
             _buffer,
             beast::bind_front_handler(
