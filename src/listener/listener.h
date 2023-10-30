@@ -5,9 +5,8 @@
 #ifndef WEBSERVER_LISTENER_H
 #define WEBSERVER_LISTENER_H
 
-#include "../session/http_session.h"
-#include "../session/https_session.h"
-#include "../session/ws_session.h"
+#include "../session/ssl/https_session.h"
+#include "../session/ssl/wss_session.h"
 #include "../test_ssl/server_cert.hpp"
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
@@ -65,7 +64,7 @@ public:
             : _port(endpoint.port()), _ioc(ioc), _acceptor(net::make_strand(ioc)), _current_type(_type), ssl_ctx(ssl::context(ssl::context::tlsv13)) {
         beast::error_code er;
 
-        if(_type==SESSION_TYPE::HTTPS)
+        if(_type==SESSION_TYPE::HTTPS||_type==SESSION_TYPE::WSS)
             load_server_certificate(ssl_ctx);
 
         _acceptor.open(endpoint.protocol(), er);

@@ -1,7 +1,6 @@
 #include "./listener.h"
 
 void listener::do_accept() {
-    // The new connection gets its own strand
     _acceptor.async_accept(
             net::make_strand(_ioc),
             beast::bind_front_handler(
@@ -18,10 +17,8 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
 
     if (ec) {
         fail(ec, "accept");
-        return; // To avoid infinite loop
+        return;
     } else {
-
-        // Create the session and run it
         auto session=get_session(std::move(socket));
         std::cout<<"Start accepting\n";
         session->run();
@@ -29,9 +26,7 @@ void listener::on_accept(beast::error_code ec, tcp::socket socket) {
     if (!stop_requested.load()) {
         do_accept();
     } else {
-        // If stopping, cancel any pending operations in the session
         socket.cancel();
-        // Close the socket to initiate the close sequence
         socket.close();
     }
 }
@@ -58,6 +53,8 @@ std::shared_ptr<session> listener::get_session(tcp::socket socket){
             return https_session::create_session(std::move(socket),doc_root_,http_request_handlers,ssl_ctx);
         case SESSION_TYPE::WS:
             return ws_session::create_session(std::move(socket));
+        case SESSION_TYPE::WSS:
+            return wss_session::create_session(std::move(socket),ssl_ctx);
         default:
             return nullptr;
     }
