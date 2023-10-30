@@ -17,13 +17,14 @@ include_directories(src/data)
 include_directories(src/data/flatbuffer)
 
 add_executable(WebServer
-        src/server.cpp
+        src/server/server.cpp
         src/main.cpp
         src/session/http_session.cpp
         src/listener/listener.cpp
         src/session/ws_session.cpp
-        src/session/https_session.cpp
+        src/session/ssl/https_session.cpp
         src/test_ssl/server_cert.hpp
+        src/session/ssl/wss_session.cpp
 )
 
 target_link_libraries(WebServer ${Boost_LIBRARIES})
