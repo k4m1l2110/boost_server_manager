@@ -2,7 +2,7 @@
 // Created by kamil on 30.10.23.
 //
 
-#include "wss_session.h"
+#include "session/ssl/wss_session.h"
 
 void wss_session::run()
 {

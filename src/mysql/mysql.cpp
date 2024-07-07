@@ -1,6 +1,6 @@
-#include "../server/server.h"
+#include <my_server/server/server.h>
 
-#include "../argon2/hash_utils.hpp"
+#include "argon2/hash_utils.hpp"
 
 void wss_server::db_connect(boost::asio::yield_context yield)
 {

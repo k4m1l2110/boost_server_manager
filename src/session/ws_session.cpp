@@ -2,7 +2,7 @@
 // Created by kamil on 25.09.23.
 //
 
-#include "ws_session.h"
+#include "session/ws_session.h"
 
 void ws_session::run() {
     net::dispatch(_ws_stream.get_executor(),
