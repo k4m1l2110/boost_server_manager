@@ -8,16 +8,12 @@
 #include "server/server.h"
 
 int main(int argc, char *argv[]) {
-    boost::property_tree::ptree pt;
-    boost::property_tree::read_json("config.json", pt);
-
-
     try {
+        boost::property_tree::ptree pt;
         boost::property_tree::read_json("config.json", pt);
 
         std::vector<std::shared_ptr<server>> servers;
 
-        // Iterate over each server object in the servers array
         for (auto& s : pt.get_child("servers")) {
             std::string type = s.second.get<std::string>("type");
             int port = s.second.get<int>("port");
@@ -39,7 +35,7 @@ int main(int argc, char *argv[]) {
 
             std::string doc_root = s.second.get<std::string>("doc_root");
 
-            std::shared_ptr<server> server_ptr = std::make_shared<server>("MAIN", "0.0.0.0", 1);
+            std::shared_ptr<server> server_ptr = std::make_shared<server>(name, address);
             servers.push_back(server_ptr);
             servers.back()->create_listener(port, type_, doc_root);
             servers.back()->start_listeing();
